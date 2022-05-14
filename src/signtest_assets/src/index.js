@@ -1,19 +1,24 @@
-import { signtest } from "../../declarations/signtest";
+import { createActor } from "../../declarations/signtest";
+import { LedgerIdentity } from "@dfinity/identity-ledgerhq";
 
 document.querySelector("form").addEventListener("submit", async (e) => {
+  let identity = await LedgerIdentity.create();
+
+  const signtest = createActor(process.env.SIGNTEST_CANISTER_ID, {
+    agentOptions: { identity },
+  });
+
   e.preventDefault();
   const button = e.target.querySelector("button");
-
-  const name = document.getElementById("name").value.toString();
 
   button.setAttribute("disabled", true);
 
   // Interact with foo actor, calling the greet method
-  const greeting = await signtest.greet(name);
+  const count = await signtest.add(3);
 
   button.removeAttribute("disabled");
 
-  document.getElementById("greeting").innerText = greeting;
+  document.getElementById("greeting").innerText = "Sum " + count;
 
   return false;
 });
